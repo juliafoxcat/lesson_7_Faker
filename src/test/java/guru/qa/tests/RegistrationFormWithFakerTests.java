@@ -3,28 +3,32 @@ package guru.qa.tests;
 import com.codeborne.selenide.Configuration;
 import guru.qa.pages.RegistrationFormPage;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.github.javafaker.Faker;
+import java.util.Locale;
 
-
+import static java.lang.String.format;
 import static com.codeborne.selenide.Selenide.$;
 
-public class RegistrationFormWithPageObjectsTests {
+public class RegistrationFormWithFakerTests extends TestBase {
     RegistrationFormPage registrationFormPage = new RegistrationFormPage();
+    Faker faker = new Faker();
+    String firstName, lastName, email, gender, mobile, day, month, year, hobbie, file, address, state, city;
 
-    private static final String firstName, lastName, email, gender, mobile, day, month, year, hobbie, file, address, state, city;
-
-    static {
-        firstName = "Iuliia";
-        lastName = "Kudrina";
-        email = "rrr@mail.com";
+    @BeforeEach
+    void prepareTestData() {
+        firstName = faker.name().firstName();
+        lastName = faker.name().lastName();
+        email = faker.internet().emailAddress();
         gender = "Other";
-        mobile = "1234567890";
-        day = "15";
-        month = "July";
-        year = "1997";
+        mobile = faker.phoneNumber().subscriberNumber(10);
+        day = faker.number().numberBetween(1, 30) + "";
+        month = "July"; // не смогла определить месяц через Faker
+        year = faker.number().numberBetween(1950, 2000) + "";
         hobbie = "Music";
         file = "Floppa.png";
-        address = "My address";
+        address = faker.address().fullAddress().substring(7);
         state = "NCR";
         city = "Delhi";
     }
@@ -50,25 +54,17 @@ public class RegistrationFormWithPageObjectsTests {
                 .setAddress(address)
                 .setPlace(state, city)
                 .submitForm();
-//        $("#subjectsInput").setValue("Math").pressEnter();
-//        $("#uploadPicture").uploadFromClasspath("1.png");
-//        $("#currentAddress").setValue("Some address 1");
-//        $("#state").click();
-//        $("#stateCity-wrapper").$(byText("NCR")).click();
-//        $("#city").click();
-//        $("#stateCity-wrapper").$(byText("Delhi")).click();
-//        $("#submit").click();
 
         registrationFormPage.checkResultsTableVisible()
-                .checkResult("Student Name", firstName + " " + lastName)
+                .checkResult("Student Name", format("%s %s", firstName, lastName))
                 .checkResult("Student Email", email)
                 .checkResult("Gender", gender)
                 .checkResult("Mobile", mobile)
-                .checkResult("Date of Birth", day + " " + month + "," + year)
+                .checkResult("Date of Birth", format("%s %s,%s", day, month, year))
                 .checkResult("Hobbies", hobbie)
                 .checkResult("Picture", file)
                 .checkResult("Address", address)
-                .checkResult("State and City", state + " " + city);
+                .checkResult("State and City", format("%s %s", state, city));
 
     }
 

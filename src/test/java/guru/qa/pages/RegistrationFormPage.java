@@ -1,4 +1,4 @@
-package guru.qa.pages.utils;
+package guru.qa.pages;
 
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.pages.components.CalendarComponent;
